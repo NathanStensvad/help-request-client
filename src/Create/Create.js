@@ -6,6 +6,10 @@ import Soundboard from '../Soundboard/Soundboard';
 class Create extends Component {
     static contextType = SoundboardContext
 
+    handleNewSoundboard = e => {
+        console.log('hi');
+    }
+
     //This is the component for the user's own soundboards that he can edit
     render() {
         return (
@@ -13,10 +17,12 @@ class Create extends Component {
                 <section>
                     <h3>My Soundboards</h3>
                 </section>
+                {/* 
                 <form>
                     <label htmlFor="search">Search:  </label>
                     <input type="text" id="search"></input>
                 </form>
+                
                 <section>
                     <label htmlFor="sort">Sort By: </label>
                     <select name="sort" id="sort">
@@ -26,11 +32,12 @@ class Create extends Component {
                     </select>
 
                 </section>
+                */}
                 <Link to="/create">+ New Soundboard</Link>
                 {this.context.soundboards
                 .filter(soundboard => soundboard.user_id === this.context.users[0].id)
                 .map(soundboard => (
-                    <Soundboard soundboard={soundboard} routeInfo={this.props.routeInfo}/>
+                    <Soundboard soundboard={soundboard} routeInfo={this.props.routeInfo} key={soundboard.id}/>
                 ))}
             </>
         )

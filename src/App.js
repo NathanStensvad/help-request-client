@@ -25,13 +25,18 @@ class App extends Component {
   
   
   //after hitting the save soundboard button in SoundboardEditor.js
-  saveSoundboard = (soundboardId, entries) => {
+  saveSoundboard = (soundboardId, entries, nameData) => {
     console.log(entries)
     console.log(soundboardId)
     //delete all the entries of the soundboard
     this.deleteEntries(soundboardId);
     //add all the new entries back
     entries.map(e => this.addSound(e.soundboard_id, e.file, e.activationKeysNumbers));
+    this.setState(prevState => ({
+      soundboards: prevState.soundboards.map(
+        e => e.id === soundboardId ? { ...e, name: nameData}: e
+      )
+    }))
   }
 
   //delete the soundboard entries to make room for new entries for saveSoundboard function
@@ -59,13 +64,21 @@ class App extends Component {
     console.log(this.state)
   }
 
+  deleteSoundboard = (soundboardId) => {
+    const newSoundboards = this.state.soundboards.filter(
+      soundboard => soundboard.id !== soundboardId
+    );
+
+    this.setState({ soundboards: newSoundboards})
+  }
+
   render() {
     const contextValue = {
       users: this.state.users,
       soundboards: this.state.soundboards,
       soundboardEntries: this.state.soundboardEntries,
-      addSound: this.addSound,
-      saveSoundboard: this.saveSoundboard
+      saveSoundboard: this.saveSoundboard,
+      deleteSoundboard: this.deleteSoundboard
     }
 
     console.log(this.state)

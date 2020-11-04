@@ -12,6 +12,7 @@ class Browse extends Component {
                 <section>
                     <h3>User Created Soundboards</h3>
                 </section>
+                {/*
                 <form>
                     <label htmlFor="search">Search:  </label>
                     <input type="text" id="search"></input>
@@ -24,6 +25,7 @@ class Browse extends Component {
                         <option value="username">user name</option>
                     </select>
                 </section>
+                */}
                 {this.context.soundboards
                 .filter(soundboard => soundboard.public === true)
                 .map(soundboard => (

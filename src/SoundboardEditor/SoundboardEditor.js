@@ -9,7 +9,10 @@ class SoundboardEditor extends Component {
     //The soundboard won't save until you hit the save soundboard button so I created a state here for the sounds from context
     constructor(props) {
         super(props);
-        this.state = {soundArray: []}
+        this.state = {
+            soundArray: [],
+            title: ""
+        }
     }
 
     //When the component is mounted, it finds the entries for the current soundboard and sets the state with those entries
@@ -19,9 +22,11 @@ class SoundboardEditor extends Component {
             e => e.soundboard_id === soundboardId).map(
                 (s) => ({...s, activationKeysNumbers: s.activationKeysNumbers.map(String) })
             )
+        const title = this.context.soundboards.find(soundboard => soundboard.id === soundboardId).name
 
         this.setState( {
-            soundArray: soundArray
+            soundArray: soundArray,
+            title: title
         })
     }
 
@@ -32,6 +37,13 @@ class SoundboardEditor extends Component {
         soundArray[index][fieldName] = newValue;
 
         this.setState({ soundArray });
+    }
+
+    updateTitle = (e) => {
+        const newTitle = e.currentTarget.value
+
+        this.setState({ title: newTitle })
+
     }
 
     //function when you add a new sound. Generates an empty input and adds it to the state
@@ -56,7 +68,7 @@ class SoundboardEditor extends Component {
         const soundboardId = this.props.routeInfo.match.params.id;
 
         //The activation numbers need to be split for an array
-        const data = this.state.soundArray.map(s => (
+        const soundData = this.state.soundArray.map(s => (
             {
                 ...s, 
                 activationKeysNumbers: s.activationKeysNumbers.map(
@@ -66,23 +78,33 @@ class SoundboardEditor extends Component {
                 )
             }
         ));
-        console.log(data)
-        this.context.saveSoundboard(soundboardId,data)
+        const titleData = this.state.title
+        this.context.saveSoundboard(soundboardId,soundData, titleData)
     }
 
     handleDeleteSoundboard = e => {
         e.preventDefault();
-        console.log('hi')
+
+        const soundboardId = this.props.routeInfo.match.params.id;
+
+        var deleteConfirmation = window.confirm("Are you sure you want to delete this soundboard?");
+
+        if(deleteConfirmation) {
+            this.context.deleteSoundboard(soundboardId)
+            this.props.routeInfo.history.push('/create');
+        }
     }
 
     //this renders a form with Sound components
     render() {
         const soundboardId = this.props.routeInfo.match.params.id;
 
+        console.log(this.state)
+
         return (
             <>
                 <header>
-                    <h1>{this.context.soundboards.find(e=> e.id === soundboardId).name}</h1>
+                    <input type="text" id={`soundboardTitle`} className="file-text center" value={this.state.title} onChange={this.updateTitle}></input>
                 </header>
                 <section className="create-items">
                     <form>
