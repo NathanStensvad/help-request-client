@@ -23,32 +23,39 @@ class App extends Component {
     console.log(this.state);
   }
   
+  
+  //after hitting the save soundboard button in SoundboardEditor.js
+  saveSoundboard = (soundboardId, entries) => {
+    console.log(entries)
+    console.log(soundboardId)
+    //delete all the entries of the soundboard
+    this.deleteEntries(soundboardId);
+    //add all the new entries back
+    entries.map(e => this.addSound(e.soundboard_id, e.file, e.activationKeysNumbers));
+  }
+
+  //delete the soundboard entries to make room for new entries for saveSoundboard function
+  deleteEntries = (soundboardId) => {
+    //filter out the entries from the soundboard
+    const newEntries = this.state.soundboardEntries.filter(
+      (entry) => entry.soundboard_id !== soundboardId
+    );
+
+    //set the new state of the soundboard entries without the current soundboard entries
+    this.setState({ soundboardEntries: newEntries });
+  }
+
+  //this will add a new sound for the saveSoundboard function
   addSound = (soundboard_id, file="", activationKeysNumbers=[]) => {
     const newSoundboardEntry = {
       soundboard_id,
       file,
       activationKeysNumbers
     }
-
+    //set the state with the new soundboard entry
     this.setState( {
       soundboardEntries: [...this.state.soundboardEntries, newSoundboardEntry]
     })
-    console.log(this.state)
-  }
-
-  saveSoundboard = (soundboardId, entries) => {
-    console.log(entries)
-    console.log(soundboardId)
-    this.deleteEntries(soundboardId);
-    entries.map(e => this.addSound(e.soundboard_id, e.file, e.activationKeysNumbers));
-  }
-
-  deleteEntries = (soundboardId) => {
-    const newEntries = this.state.soundboardEntries.filter(
-      (entry) => entry.soundboard_id !== soundboardId
-    );
-
-    this.setState({ soundboardEntries: newEntries });
     console.log(this.state)
   }
 

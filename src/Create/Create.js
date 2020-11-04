@@ -6,6 +6,7 @@ import Soundboard from '../Soundboard/Soundboard';
 class Create extends Component {
     static contextType = SoundboardContext
 
+    //This is the component for the user's own soundboards that he can edit
     render() {
         return (
             <>

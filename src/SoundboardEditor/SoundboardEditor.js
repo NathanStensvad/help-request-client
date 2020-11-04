@@ -6,11 +6,13 @@ import Sound from '../Sound/Sound';
 class SoundboardEditor extends Component {
     static contextType = SoundboardContext
 
+    //The soundboard won't save until you hit the save soundboard button so I created a state here for the sounds from context
     constructor(props) {
         super(props);
         this.state = {soundArray: []}
     }
 
+    //When the component is mounted, it finds the entries for the current soundboard and sets the state with those entries
     componentDidMount() {
         const soundboardId = this.props.routeInfo.match.params.id;
         const soundArray = this.context.soundboardEntries.filter(
@@ -23,6 +25,7 @@ class SoundboardEditor extends Component {
         })
     }
 
+    //The soundArray state will update when you change the input values
     updateField = (index, fieldName, newValue) => {
 
         const {soundArray} = this.state;
@@ -31,6 +34,7 @@ class SoundboardEditor extends Component {
         this.setState({ soundArray });
     }
 
+    //function when you add a new sound. Generates an empty input and adds it to the state
     handleAddSound = e => {
         e.preventDefault();
         const soundboardId = this.props.routeInfo.match.params.id;
@@ -46,9 +50,12 @@ class SoundboardEditor extends Component {
         })
     }
 
+    //This function uses context to save all the sounds to the soundboardEntries context
     handleSaveSoundboard = e => {
         e.preventDefault();
         const soundboardId = this.props.routeInfo.match.params.id;
+
+        //The activation numbers need to be split for an array
         const data = this.state.soundArray.map(s => (
             {
                 ...s, 
@@ -68,6 +75,7 @@ class SoundboardEditor extends Component {
         console.log('hi')
     }
 
+    //this renders a form with Sound components
     render() {
         const soundboardId = this.props.routeInfo.match.params.id;
 
