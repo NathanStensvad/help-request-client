@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import SoundboardContext from '../SoundboardContext';
-import { Link } from 'react-router-dom';
 import Sound from '../Sound/Sound';
+import config from '../config';
 
 class SoundboardEditor extends Component {
     static contextType = SoundboardContext
@@ -11,7 +11,8 @@ class SoundboardEditor extends Component {
         super(props);
         this.state = {
             soundArray: [],
-            title: ""
+            title: "",
+            public: false
         }
     }
 
@@ -20,20 +21,21 @@ class SoundboardEditor extends Component {
         const soundboardId = this.props.routeInfo.match.params.id;
         const soundArray = this.context.soundboardEntries.filter(
             e => e.soundboard_id === soundboardId).map(
-                (s) => ({...s, activationKeysNumbers: s.activationKeysNumbers.map(String) })
+                (s) => ({ ...s, activationKeysNumbers: s.activationKeysNumbers.map(String) })
             )
         const title = this.context.soundboards.find(soundboard => soundboard.id === soundboardId).name
-
-        this.setState( {
+        const isPublic = this.context.soundboards.find(soundboard => soundboard.id === soundboardId).public
+        this.setState({
             soundArray: soundArray,
-            title: title
+            title: title,
+            public: isPublic
         })
     }
 
     //The soundArray state will update when you change the input values
     updateField = (index, fieldName, newValue) => {
 
-        const {soundArray} = this.state;
+        const { soundArray } = this.state;
         soundArray[index][fieldName] = newValue;
 
         this.setState({ soundArray });
@@ -46,18 +48,24 @@ class SoundboardEditor extends Component {
 
     }
 
+    updatePublic = (e) => {
+        const isPublic = e.currentTarget.checked
+
+        this.setState({ public: isPublic })
+    }
+
     //function when you add a new sound. Generates an empty input and adds it to the state
     handleAddSound = e => {
         e.preventDefault();
         const soundboardId = this.props.routeInfo.match.params.id;
         const newSoundboardEntry = {
-            
+
             soundboard_id: soundboardId,
             file: "",
             activationKeysNumbers: []
-          }
+        }
 
-        this.setState( {
+        this.setState({
             soundArray: [...this.state.soundArray, newSoundboardEntry]
         })
     }
@@ -66,20 +74,49 @@ class SoundboardEditor extends Component {
     handleSaveSoundboard = e => {
         e.preventDefault();
         const soundboardId = this.props.routeInfo.match.params.id;
+        const isFilled = (sound) => (!!sound.file && !!sound.activationKeysNumbers && !!sound.activationKeysNumbers.length);
 
         //The activation numbers need to be split for an array
         const soundData = this.state.soundArray.map(s => (
             {
-                ...s, 
+                ...s,
                 activationKeysNumbers: s.activationKeysNumbers.map(
                     k => Number(k.trim())
                 ).filter(
                     k => !Number.isNaN(k)
                 )
             }
-        ));
+        )).filter(isFilled);
         const titleData = this.state.title
-        this.context.saveSoundboard(soundboardId,soundData, titleData)
+        const isPublic = this.state.public
+
+        const soundboard = {
+            title: titleData,
+            public: isPublic,
+            soundboardentries: soundData
+        }
+
+        //this.context.saveSoundboard(soundboardId, soundData, titleData, isPublic)
+
+        fetch(config.API_ENDPOINT, {
+            method: 'POST',
+            body: JSON.stringify(soundboard),
+            headers: {
+                'content-type': 'application/json',
+                'authorization': `Bearer ${config.API_KEY}`
+            }
+        })
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(error => Promise.reject(error))
+            }
+            return res.json()
+        })
+        .then(
+            data => console.log(data)
+            //data => this.context.saveSoundBoard(data)
+        )
+
     }
 
     handleDeleteSoundboard = e => {
@@ -89,7 +126,7 @@ class SoundboardEditor extends Component {
 
         var deleteConfirmation = window.confirm("Are you sure you want to delete this soundboard?");
 
-        if(deleteConfirmation) {
+        if (deleteConfirmation) {
             this.context.deleteSoundboard(soundboardId)
             this.props.routeInfo.history.push('/create');
         }
@@ -97,8 +134,6 @@ class SoundboardEditor extends Component {
 
     //this renders a form with Sound components
     render() {
-        const soundboardId = this.props.routeInfo.match.params.id;
-
         console.log(this.state)
 
         return (
@@ -110,21 +145,21 @@ class SoundboardEditor extends Component {
                     <form>
                         <div>
                             <label htmlFor="public">Public:</label>
-                            <input type="checkbox" id="public"></input>
+                            <input form="soundform" type="checkbox" onChange={this.updatePublic} checked={this.state.public} id="public"></input>
                         </div>
                         <div>
                             <button form="soundform" onClick={e => this.handleSaveSoundboard(e)}>Save Soundboard</button>
-                            <br/>
+                            <br />
                             <button onClick={e => this.handleDeleteSoundboard(e)}>Delete Soundboard</button>
                         </div>
                     </form>
-                    
+
                 </section>
                 <form id="soundform">
-                {this.state.soundArray
-                    .map((entry, index) => (
-                        <Sound routeInfo={this.props.routeInfo} entry={entry} index={index} key={index} onChange={this.updateField}/>
-                    ))}
+                    {this.state.soundArray
+                        .map((entry, index) => (
+                            <Sound routeInfo={this.props.routeInfo} entry={entry} index={index} key={index} onChange={this.updateField} />
+                        ))}
                 </form>
                 <section>
                     <button onClick={e => this.handleAddSound(e)}>Add Sound</button>

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import SoundboardContext from '../SoundboardContext';
 import Soundboard from '../Soundboard/Soundboard';
 
@@ -7,11 +6,12 @@ class Create extends Component {
     static contextType = SoundboardContext
 
     handleNewSoundboard = e => {
-        console.log('hi');
+        this.context.newSoundboard();
     }
 
     //This is the component for the user's own soundboards that he can edit
     render() {
+        console.log(this.context)
         return (
             <>
                 <section>
@@ -33,7 +33,7 @@ class Create extends Component {
 
                 </section>
                 */}
-                <Link to="/create">+ New Soundboard</Link>
+                <button onClick={this.handleNewSoundboard}>+ New Soundboard</button>
                 {this.context.soundboards
                 .filter(soundboard => soundboard.user_id === this.context.users[0].id)
                 .map(soundboard => (

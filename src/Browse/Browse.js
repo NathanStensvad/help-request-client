@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import SoundboardContext from '../SoundboardContext';
-import { Link } from 'react-router-dom';
 import Soundboard from '../Soundboard/Soundboard';
 
 class Browse extends Component {
