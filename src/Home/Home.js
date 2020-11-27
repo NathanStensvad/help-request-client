@@ -5,6 +5,11 @@ import config from '../config';
 class Home extends Component {
     static contextType = SoundboardContext
 
+    logoutSubmitted = e => {
+        e.preventDefault();
+        this.context.logout()
+    }
+
     loginSubmitted = e => {
         e.preventDefault();
         const name = e.currentTarget.name.value
@@ -12,7 +17,7 @@ class Home extends Component {
 
         fetch(config.API_ENDPOINT + '/login', {
             method: 'POST',
-            headers: { 'content-type': 'application/json'},
+            headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ name, password })
         })
             .then(res => {
@@ -25,10 +30,22 @@ class Home extends Component {
                 console.log(e)
             })
     }
-
     render() {
         return (
             <>
+                {this.context.isLoggedIn()
+                    ?
+                    <>
+                    <div>Logged in as {this.context.currentUser.name}</div>
+                    <button onClick={this.logoutSubmitted}>Logout</button>
+                    </>
+                    :
+                    <form className="how" onSubmit={this.loginSubmitted}>
+                        <label>Sign in: </label>
+                        <input name="name" type="text" placeholder="User Name"></input>
+                        <input name="password" type="password" placeholder="Password"></input>
+                        <button>Sign in</button>
+                    </form>}
                 <section className="how center">
                     <h3>About the EXP soundboard</h3>
                     <p>
@@ -50,16 +67,6 @@ class Home extends Component {
                     </p>
                     <p>(Show some creation instruction pictures)</p>
                 </section>
-                {this.context.isLoggedIn() 
-                ? 
-                <div>Logged in as {this.context.currentUser.name}</div> 
-                : 
-                <form className="how" onSubmit={this.loginSubmitted}>
-                    <label>Sign in: </label>
-                    <input name="name" type="text" placeholder="User Name"></input>
-                    <input name="password" type="password" placeholder="Password"></input>
-                    <button>Sign in</button>
-                </form>}
             </>
         )
     }

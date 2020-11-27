@@ -30,6 +30,9 @@ class Soundboard extends Component {
     handleFork = e => {
         e.preventDefault()
         console.log("Feature not implemented")
+        /*console.log(this.props.soundboard.id)
+        console.log(this.context.soundboardEntries
+                    .filter(soundboard => soundboard.soundboard_id === this.props.soundboard.id))*/
     }
 
     render() {

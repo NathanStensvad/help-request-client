@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import SoundboardContext from '../SoundboardContext';
 import Sound from '../Sound/Sound';
 import config from '../config';
+import AuthHelper from '../AuthHelper';
 
 class SoundboardEditor extends Component {
     static contextType = SoundboardContext
@@ -112,6 +113,7 @@ class SoundboardEditor extends Component {
             body: JSON.stringify(soundboard),
             headers: {
                 'content-type': 'application/json',
+                'Authorization': `Bearer ${AuthHelper.getToken()}`
             }
         })
             .then(res => {
@@ -139,7 +141,8 @@ class SoundboardEditor extends Component {
             fetch(config.API_ENDPOINT + `/api/soundboards/${soundboardId}`, {
                 method: 'DELETE',
                 headers: {
-                    'content-type': 'application/json'
+                    'content-type': 'application/json',
+                    'Authorization': `Bearer ${AuthHelper.getToken()}`
                 }
             })
                 .then(res => {
