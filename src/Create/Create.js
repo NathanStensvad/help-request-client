@@ -11,7 +11,10 @@ class Create extends Component {
 
     //This is the component for the user's own soundboards that he can edit
     render() {
-        console.log(this.context)
+
+        console.log(this.context.soundboardEntries)
+
+        //hardcode user
         return (
             <>
                 <section>

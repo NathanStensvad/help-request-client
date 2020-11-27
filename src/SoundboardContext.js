@@ -9,4 +9,5 @@ export default React.createContext({
     deleteSoundBoard: () => {},
     addSound: () => {},
     deleteSound: () => {},
+    login: () => {}
 })

@@ -1,8 +1,30 @@
 import React, { Component } from 'react';
 import SoundboardContext from '../SoundboardContext'
+import config from '../config';
 
 class Home extends Component {
     static contextType = SoundboardContext
+
+    loginSubmitted = e => {
+        e.preventDefault();
+        const name = e.currentTarget.name.value
+        const password = e.currentTarget.password.value
+
+        fetch(config.API_ENDPOINT + '/login', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json'},
+            body: JSON.stringify({ name, password })
+        })
+            .then(res => {
+                if (!res.ok) throw Error(res.statusText);
+                return res.json()
+            })
+            .then(this.context.login)
+            .catch(e => {
+                alert("Couldn't log in")
+                console.log(e)
+            })
+    }
 
     render() {
         return (
@@ -28,12 +50,16 @@ class Home extends Component {
                     </p>
                     <p>(Show some creation instruction pictures)</p>
                 </section>
-                <form className="how">
+                {this.context.isLoggedIn() 
+                ? 
+                <div>Logged in as {this.context.currentUser.name}</div> 
+                : 
+                <form className="how" onSubmit={this.loginSubmitted}>
                     <label>Sign in: </label>
-                    <input name="username" type="text" placeholder="User Name"></input>
-                    <input name="password" type="text" placeholder="Password"></input>
+                    <input name="name" type="text" placeholder="User Name"></input>
+                    <input name="password" type="password" placeholder="Password"></input>
                     <button>Sign in</button>
-                </form>
+                </form>}
             </>
         )
     }

@@ -1,12 +1,12 @@
 export default {
     "users": [
         {
-            "id": "1",
+            "id": 1,
             "name": "Nathan Stensvad",
             "password": "holeymoley"
         },
         {
-            "id": "2",
+            "id": 2,
             "name": "Rick Sanchez",
             "password": "burp"
         }

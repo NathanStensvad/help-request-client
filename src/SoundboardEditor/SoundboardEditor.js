@@ -11,23 +11,25 @@ class SoundboardEditor extends Component {
         super(props);
         this.state = {
             soundArray: [],
-            title: "",
+            name: "",
             public: false
         }
     }
 
     //When the component is mounted, it finds the entries for the current soundboard and sets the state with those entries
     componentDidMount() {
-        const soundboardId = this.props.routeInfo.match.params.id;
+        const soundboardId = Number(this.props.routeInfo.match.params.id);
         const soundArray = this.context.soundboardEntries.filter(
             e => e.soundboard_id === soundboardId).map(
                 (s) => ({ ...s, activationKeysNumbers: s.activationKeysNumbers.map(String) })
             )
-        const title = this.context.soundboards.find(soundboard => soundboard.id === soundboardId).name
-        const isPublic = this.context.soundboards.find(soundboard => soundboard.id === soundboardId).public
+        const soundboard = this.context.soundboards.find(soundboard => soundboard.id === soundboardId)
+        if(!soundboard) return;
+        const name = soundboard.name
+        const isPublic = soundboard.public
         this.setState({
             soundArray: soundArray,
-            title: title,
+            name: name,
             public: isPublic
         })
     }
@@ -41,10 +43,10 @@ class SoundboardEditor extends Component {
         this.setState({ soundArray });
     }
 
-    updateTitle = (e) => {
-        const newTitle = e.currentTarget.value
+    updateName = (e) => {
+        const newName = e.currentTarget.value
 
-        this.setState({ title: newTitle })
+        this.setState({ name: newName })
 
     }
 
@@ -57,7 +59,7 @@ class SoundboardEditor extends Component {
     //function when you add a new sound. Generates an empty input and adds it to the state
     handleAddSound = e => {
         e.preventDefault();
-        const soundboardId = this.props.routeInfo.match.params.id;
+        const soundboardId = parseInt(this.props.routeInfo.match.params.id);
         const newSoundboardEntry = {
 
             soundboard_id: soundboardId,
@@ -70,10 +72,18 @@ class SoundboardEditor extends Component {
         })
     }
 
+    handleDeleteSound = index => {
+        const newSounds = this.state.soundArray.filter(
+            (sound, i) => i !== index
+        )
+
+        this.setState({ soundArray: newSounds })
+    }
+
     //This function uses context to save all the sounds to the soundboardEntries context
     handleSaveSoundboard = e => {
         e.preventDefault();
-        const soundboardId = this.props.routeInfo.match.params.id;
+        const soundboardId = parseInt(this.props.routeInfo.match.params.id);
         const isFilled = (sound) => (!!sound.file && !!sound.activationKeysNumbers && !!sound.activationKeysNumbers.length);
 
         //The activation numbers need to be split for an array
@@ -87,59 +97,69 @@ class SoundboardEditor extends Component {
                 )
             }
         )).filter(isFilled);
-        const titleData = this.state.title
+
+        const nameData = this.state.name
         const isPublic = this.state.public
 
         const soundboard = {
-            title: titleData,
+            name: nameData,
             public: isPublic,
-            soundboardentries: soundData
+            soundboardEntries: soundData
         }
 
-        //this.context.saveSoundboard(soundboardId, soundData, titleData, isPublic)
-
-        fetch(config.API_ENDPOINT, {
-            method: 'POST',
+        fetch(config.API_ENDPOINT + `/api/soundboards/${soundboardId}`, {
+            method: 'PATCH',
             body: JSON.stringify(soundboard),
             headers: {
                 'content-type': 'application/json',
-                'authorization': `Bearer ${config.API_KEY}`
             }
         })
-        .then(res => {
-            if (!res.ok) {
-                return res.json().then(error => Promise.reject(error))
-            }
-            return res.json()
-        })
-        .then(
-            data => console.log(data)
-            //data => this.context.saveSoundBoard(data)
-        )
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(error => Promise.reject(error))
+                }
+                this.context.saveSoundboard(soundboardId, soundData, nameData, isPublic)
+                this.props.routeInfo.history.push('/create')
+            })
+            .catch(error => {
+                console.error(error)
+                this.setState({ error })
+            })
 
     }
 
     handleDeleteSoundboard = e => {
         e.preventDefault();
 
-        const soundboardId = this.props.routeInfo.match.params.id;
+        const soundboardId = parseInt(this.props.routeInfo.match.params.id);
 
         var deleteConfirmation = window.confirm("Are you sure you want to delete this soundboard?");
 
         if (deleteConfirmation) {
-            this.context.deleteSoundboard(soundboardId)
-            this.props.routeInfo.history.push('/create');
+            fetch(config.API_ENDPOINT + `/api/soundboards/${soundboardId}`, {
+                method: 'DELETE',
+                headers: {
+                    'content-type': 'application/json'
+                }
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        return res.json().then(error => Promise.reject(error))
+                    }
+                    this.context.deleteSoundboard(soundboardId)
+                    this.props.routeInfo.history.push('/create');
+                })
         }
     }
 
     //this renders a form with Sound components
     render() {
-        console.log(this.state)
 
+        console.log(this.state.soundArray)
         return (
             <>
                 <header>
-                    <input type="text" id={`soundboardTitle`} className="file-text center" value={this.state.title} onChange={this.updateTitle}></input>
+                    <input type="text" id={`soundboardName`} className="file-text center" value={this.state.name} onChange={this.updateName}></input>
                 </header>
                 <section className="create-items">
                     <form>
@@ -158,7 +178,7 @@ class SoundboardEditor extends Component {
                 <form id="soundform">
                     {this.state.soundArray
                         .map((entry, index) => (
-                            <Sound routeInfo={this.props.routeInfo} entry={entry} index={index} key={index} onChange={this.updateField} />
+                            <Sound routeInfo={this.props.routeInfo} entry={entry} index={index} key={index} isSoundboardEditor={true} onChange={this.updateField} onDelete={this.handleDeleteSound} />
                         ))}
                 </form>
                 <section>

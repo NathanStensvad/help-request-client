@@ -17,7 +17,24 @@ class Sound extends Component {
         this.props.onChange(this.props.index, 'activationKeysNumbers', keys);
     }
 
+    handleDelete = e => {
+        e.preventDefault()
+        this.props.onDelete(this.props.index)
+    }
+
     render() {
+
+        console.log(this.props.entry)
+
+        let deleteButton;
+
+        if(this.props.isSoundboardEditor) {
+            deleteButton = <button onClick={this.handleDelete}>Delete</button>
+        }
+        else {
+            deleteButton = <></>
+        }
+
         return (
             <>
                 <section className="how">
@@ -26,6 +43,8 @@ class Sound extends Component {
                     <br />
                     <label htmlFor={`activationKeysNumbers${this.props.index}`}> Activation Keys: </label>
                     <input type="text" id={`activationKeysNumbers${this.props.index}`} value={this.props.entry.activationKeysNumbers.join()} onChange={this.updateActivationKeys}></input>
+                    <br />
+                    {deleteButton}
                 </section>
             </>
         )

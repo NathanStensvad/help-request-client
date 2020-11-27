@@ -27,12 +27,19 @@ class Soundboard extends Component {
         window.open(file);
     }
 
+    handleFork = e => {
+        e.preventDefault()
+        console.log("Feature not implemented")
+    }
+
     render() {
         let routePath = this.props.routeInfo.match.path
 
+        console.log(this.props.routeInfo)
+
         let forkButton;
         if(this.props.isBrowse) {
-            forkButton = <button>Fork</button>
+            forkButton = <button onClick={this.handleFork}>Fork</button>
         }
         else {
             forkButton = <></>

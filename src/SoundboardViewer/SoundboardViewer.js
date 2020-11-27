@@ -9,6 +9,11 @@ class SoundboardViewer extends Component {
 
     }
 
+    handleFork = e => {
+        e.preventDefault()
+        console.log("feature not implemented")
+    }
+
     render() {
         return (
             <>
@@ -18,14 +23,14 @@ class SoundboardViewer extends Component {
                 <section className="create-items">
                     <form>
                         <div>
-                            <button>Fork Soundboard</button>
+                            <button onClick={this.handleFork}>Fork Soundboard</button>
                         </div>
                     </form>
                 </section>
                 {this.context.soundboardEntries
-                    .filter(e => e.soundboard_id === this.props.routeInfo.match.params.id)
+                    .filter(e => e.soundboard_id === parseInt(this.props.routeInfo.match.params.id))
                     .map((entry,index) => (
-                <Sound routeInfo={this.props.routeInfo} entry={entry} index={index} key={index} onChange={this.updateField}/>
+                <Sound routeInfo={this.props.routeInfo} entry={entry} index={index} key={index} isSoundboardEditor={false} onChange={this.updateField}/>
                 ))}
             </>
         )
