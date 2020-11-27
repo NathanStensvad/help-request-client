@@ -14,6 +14,7 @@ import config from './config';
 
 class App extends Component {
 
+  //hard coded user id?
   state = {
     users: STORE.users,
     soundboards: [],
@@ -22,25 +23,22 @@ class App extends Component {
     loginInfo: { user: null, token: null }
   }
 
-  isLoggedIn = () => {  // true/false
-    return !!this.state.loginInfo.token;
-  }
-  
+  //fetch soundboards and saved login info
+  //this needs some work. I'd like to set up a promise(?) to do all the login stuff and then the fetch.
+  //Currently the user_id doesn't update fast enough for the fetch to fetch the right stuff
+  //So for user 2, I won't be able to see his private soundboards unless i fetch again
   componentDidMount() {
-    this.fetchSoundboards()
-
     const loginInfo = AuthHelper.getLoginInfo();
-
-    if(loginInfo) {
-      this.setState({ loginInfo });
+    
+    if (loginInfo) {
+      this.setState({ loginInfo, user_id: loginInfo.user.id});
     }
-  }
-  
-  login = (loginInfo) => {
-    this.setState({ loginInfo })
-    AuthHelper.setLoginInfo(loginInfo)
+
+    this.fetchSoundboards()
   }
 
+  //fetch function for when the app starts and when a new soundboard is made
+  //I want to fetch differently based on the user id. 
   fetchSoundboards = () => {
     fetch(config.API_ENDPOINT + `/api/users/${this.state.user_id}/soundboards`, {
       method: 'GET',
@@ -69,6 +67,45 @@ class App extends Component {
       })
   }
 
+  //basic new soundboard without any name
+  newSoundboard = (id) => {
+    //hard coded user id needs fixing
+    console.log(id)
+    console.log(typeof id)
+    const newSoundboard = {
+      name: '',
+      public: false,
+      user_id: id
+    }
+
+    fetch(config.API_ENDPOINT + '/api/soundboards', {
+      method: 'POST',
+      body: JSON.stringify(newSoundboard),
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${AuthHelper.getToken()}`
+      }
+    })
+      .then(r => {
+        if (!r.ok) {
+          return r.json().then(error => Promise.reject(error))
+        }
+        return r.json()
+      })
+      .then(
+        this.fetchSoundboards() //This is basically another componentDidMount
+      )
+      .catch(error => {
+        console.error(error)
+        this.setState({ error })
+      })
+
+
+    /*this.setState({
+      soundboards: [...this.state.soundboards, newSoundboard],
+    })*/
+  }
+
   //after hitting the save soundboard button in SoundboardEditor.js
   saveSoundboard = (soundboardId, entries, nameData, isPublic) => {
     console.log(this.state.soundboardEntries)
@@ -79,11 +116,11 @@ class App extends Component {
     }));
 
     // delete all the old entries, then add all the (new) ones you got from the form
-    
+
     this.deleteEntries(soundboardId, () => this.addSounds(...sounds));
 
     console.log(this.state.soundboardEntries)
- 
+
     this.setState(prevState => ({
       soundboards: prevState.soundboards.map(
         e => parseInt(e.id) === parseInt(soundboardId) ? { ...e, name: nameData, public: isPublic } : e
@@ -118,11 +155,7 @@ class App extends Component {
     console.log(this.state.soundboardEntries)
   }
 
-  //this will add a new sound for the saveSoundboard function
-  /*addSound = (soundboard_id, file = "", activationKeysNumbers = []) => {
-    this.addSounds({ soundboard_id, file, activationKeysNumbers })
-  }*/
-
+  //function to delete a soundboard
   deleteSoundboard = (soundboardId) => {
     const newSoundboards = this.state.soundboards.filter(
       soundboard => soundboard.id !== soundboardId
@@ -134,41 +167,20 @@ class App extends Component {
     );
   }
 
-  //hardcode user
-  //My solution for adding a new soundboard was to do another fetch. This seems inefficient and I need help here.
-  newSoundboard = () => {
-    const newSoundboard = {
-      name: '',
-      public: false,
-      user_id: 1
-    }
+  //functions for logging in or out
+  login = (loginInfo) => {
+    this.setState({ loginInfo })
+    AuthHelper.setLoginInfo(loginInfo)
+  }
 
-    fetch(config.API_ENDPOINT + '/api/soundboards', {
-      method: 'POST',
-      body: JSON.stringify(newSoundboard),
-      headers: {
-        'content-type': 'application/json',
-        'Authorization': `Bearer ${AuthHelper.getToken()}`
-      }
-    })
-      .then(r => {
-        if(!r.ok) {
-          return r.json().then(error => Promise.reject(error))
-        }
-        return r.json()
-      })
-      .then(
-        this.fetchSoundboards() //This is basically another componentDidMount
-      )
-      .catch(error => {
-        console.error(error)
-        this.setState({ error })
-      })
+  logout = () => {
+    this.setState({ loginInfo: { user: null, token: null } })
+    AuthHelper.deleteLoginInfo()
+  }
 
-
-    /*this.setState({
-      soundboards: [...this.state.soundboards, newSoundboard],
-    })*/
+  //what's this function used for?
+  isLoggedIn = () => {  // true/false
+    return !!this.state.loginInfo.token;
   }
 
   render() {
@@ -180,6 +192,7 @@ class App extends Component {
       saveSoundboard: this.saveSoundboard,
       deleteSoundboard: this.deleteSoundboard,
       login: this.login,
+      logout: this.logout,
       isLoggedIn: this.isLoggedIn,
       currentUser: this.state.loginInfo.user
     }
@@ -193,6 +206,7 @@ class App extends Component {
             <header>
               <h1>EXP Soundboard Manager</h1>
             </header>
+
             <section className="group nav">
               <Link to="/"><h2>How it works</h2></Link>
               <Link to="/browse"><h2>Browse</h2></Link>
