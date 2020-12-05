@@ -37,25 +37,13 @@ class Soundboard extends Component {
 
     render() {
         let routePath = this.props.routeInfo.match.path
-
-        console.log(this.props.routeInfo)
-
-        let forkButton;
-        if(this.props.isBrowse) {
-            forkButton = <button onClick={this.handleFork}>Fork</button>
-        }
-        else {
-            forkButton = <></>
-        }
-
         return (
             <>
                 <section className="how" key={this.props.soundboard.id}>
                     <Link to={`${routePath}/${this.props.soundboard.id}`}><h3>{this.props.soundboard.name}</h3></Link>
                     <p>{this.context.soundboardEntries.filter(e => this.props.soundboard.id === e.soundboard_id).length} sounds</p>
-                    <p>Created by: {this.context.users.find(e => this.props.soundboard.user_id === e.id).name}</p>
+                    {/*<p>Created by: {this.context.users.find(e => this.props.soundboard.user_id === e.id).name}</p>*/}
                     <button onClick={this.handleDownload}>Download</button>
-                    {forkButton}
                 </section>
             </>
         )

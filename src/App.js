@@ -19,28 +19,25 @@ class App extends Component {
     users: STORE.users,
     soundboards: [],
     soundboardEntries: [],
-    user_id: 1,
     loginInfo: { user: null, token: null }
   }
 
   //fetch soundboards and saved login info
-  //this needs some work. I'd like to set up a promise(?) to do all the login stuff and then the fetch.
-  //Currently the user_id doesn't update fast enough for the fetch to fetch the right stuff
-  //So for user 2, I won't be able to see his private soundboards unless i fetch again
   componentDidMount() {
     const loginInfo = AuthHelper.getLoginInfo();
-    
-    if (loginInfo) {
-      this.setState({ loginInfo, user_id: loginInfo.user.id});
-    }
 
-    this.fetchSoundboards()
+    if (loginInfo) {
+      this.setState(
+        { loginInfo },
+        this.fetchSoundboards);
+    }
   }
 
   //fetch function for when the app starts and when a new soundboard is made
   //I want to fetch differently based on the user id. 
   fetchSoundboards = () => {
-    fetch(config.API_ENDPOINT + `/api/users/${this.state.user_id}/soundboards`, {
+    console.log(this.state.loginInfo)
+    fetch(config.API_ENDPOINT + `/api/users/${this.state.loginInfo.user.id}/soundboards`, {
       method: 'GET',
       headers: {
         'content-type': 'application/json'
@@ -75,7 +72,6 @@ class App extends Component {
     const newSoundboard = {
       name: '',
       public: false,
-      user_id: id
     }
 
     fetch(config.API_ENDPOINT + '/api/soundboards', {
@@ -167,9 +163,27 @@ class App extends Component {
     );
   }
 
+  forkSoundboard = (soundboardId) => {
+
+    fetch(config.API_ENDPOINT + `/api/soundboards/${soundboardId}/fork`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${AuthHelper.getToken()}`
+      }
+    })
+      .then(
+        this.fetchSoundboards
+        )
+      .catch(error => {
+        console.error(error)
+        this.setState({ error })
+      })
+  }
+
   //functions for logging in or out
   login = (loginInfo) => {
-    this.setState({ loginInfo })
+    this.setState({ loginInfo }, this.fetchSoundboards)
     AuthHelper.setLoginInfo(loginInfo)
   }
 
@@ -191,6 +205,7 @@ class App extends Component {
       newSoundboard: this.newSoundboard,
       saveSoundboard: this.saveSoundboard,
       deleteSoundboard: this.deleteSoundboard,
+      forkSoundboard: this.forkSoundboard,
       login: this.login,
       logout: this.logout,
       isLoggedIn: this.isLoggedIn,
@@ -209,8 +224,8 @@ class App extends Component {
 
             <section className="group nav">
               <Link to="/"><h2>How it works</h2></Link>
-              <Link to="/browse"><h2>Browse</h2></Link>
-              <Link to="/create"><h2>Create</h2></Link>
+              {this.isLoggedIn() && <Link to="/browse"><h2>Browse</h2></Link>}
+              {this.isLoggedIn() && <Link to="/create"><h2>Create</h2></Link>}
             </section>
             <div>
               <Route

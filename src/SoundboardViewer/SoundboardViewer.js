@@ -5,13 +5,11 @@ import Sound from '../Sound/Sound';
 class SoundboardViewer extends Component {
     static contextType = SoundboardContext
 
-    updateField = e => {
-
-    }
-
     handleFork = e => {
         e.preventDefault()
-        console.log("feature not implemented")
+
+        this.context.forkSoundboard(this.props.routeInfo.match.params.id)
+        this.props.routeInfo.history.push('/create')
     }
 
     render() {

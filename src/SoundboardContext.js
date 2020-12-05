@@ -9,5 +9,7 @@ export default React.createContext({
     deleteSoundBoard: () => {},
     addSound: () => {},
     deleteSound: () => {},
-    login: () => {}
+    forkSoundboard: () => {},
+    login: () => {},
+    isLoggedIn: () => {}
 })

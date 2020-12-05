@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Soundboard from './Soundboard';
+import SoundboardViewer from './SoundboardViewer';
 import renderer from 'react-test-renderer';
 import { BrowserRouter } from 'react-router-dom'
 
@@ -15,11 +15,14 @@ it('renders without crashing', () => {
 
     const testInfo = {
         match: {
+            params: {
+                id: 2
+            },
             path: '/create'
         }
         
     }
 
-    ReactDOM.render(<BrowserRouter><Soundboard routeInfo={testInfo} soundboard={soundboard}/></BrowserRouter>, div);
+    ReactDOM.render(<BrowserRouter><SoundboardViewer routeInfo={testInfo} soundboard={soundboard}/></BrowserRouter>, div);
     ReactDOM.unmountComponentAtNode(div);
 })

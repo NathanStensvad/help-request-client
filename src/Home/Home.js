@@ -15,7 +15,7 @@ class Home extends Component {
         const name = e.currentTarget.name.value
         const password = e.currentTarget.password.value
 
-        fetch(config.API_ENDPOINT + '/login', {
+        fetch(config.API_ENDPOINT + '/api/login', {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({ name, password })
