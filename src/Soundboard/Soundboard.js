@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import SoundBoardContext from '../SoundboardContext'
 
 function generateJSONFile(json) {
-    const contents = JSON.stringify(json);
-    const fileBlob = new Blob([contents], {type: 'application/json'});
+    const contents = JSON.stringify({ soundboardEntries: json });
+    const fileBlob = new Blob([contents], { type: 'data:application/json' });
     return window.URL.createObjectURL(fileBlob);
 }
 
@@ -14,17 +14,20 @@ class Soundboard extends Component {
     handleDownload = e => {
         e.preventDefault()
         const download = this.context.soundboardEntries
-        .filter(soundboard => soundboard.soundboard_id === this.props.soundboard.id)
-        .map(
-            ({file, activationKeysNumbers}) => ({file, activationKeysNumbers})
-        )
+            .filter(soundboard => soundboard.soundboard_id === this.props.soundboard.id)
+            .map(
+                ({ file, activationKeysNumbers }) => ({ file, activationKeysNumbers })
+            )
         console.log(this.props.soundboard.name)
         console.log(download)
 
-        const example = {text: "hello"}
-
         const file = generateJSONFile(download)
-        window.open(file);
+        const name = this.props.soundboard.name;
+        const a = document.createElement('a');
+        a.href = file;
+        a.download = `${name}.json`;
+        a.click();
+        a.remove();
     }
 
     handleFork = e => {

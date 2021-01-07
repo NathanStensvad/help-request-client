@@ -7,7 +7,8 @@ class Create extends Component {
 
     //New soundboard for the designated user
     handleNewSoundboard = e => {
-        this.context.newSoundboard(this.context.currentUser.id);
+        
+        this.context.newSoundboard(this.context.currentUser.id).then(response => this.props.routeInfo.history.push(`/create/${response.id}`));
     }
 
     //This is the component for the user's own soundboards that he can edit
@@ -23,12 +24,12 @@ class Create extends Component {
         else {
             showSoundboards = this.context.soundboards
             .filter(soundboard => soundboard.user_id === this.context.currentUser.id)
+            .reverse()
             .map(soundboard => (
                 <Soundboard soundboard={soundboard} routeInfo={this.props.routeInfo} key={soundboard.id}/>
             ))
         }
 
-        //hardcode user
         return (
             <>
                 <section>

@@ -37,7 +37,7 @@ class App extends Component {
   //I want to fetch differently based on the user id. 
   fetchSoundboards = () => {
     console.log(this.state.loginInfo)
-    fetch(config.API_ENDPOINT + `/api/users/${this.state.loginInfo.user.id}/soundboards`, {
+    return fetch(config.API_ENDPOINT + `/api/users/${this.state.loginInfo.user.id}/soundboards`, {
       method: 'GET',
       headers: {
         'content-type': 'application/json'
@@ -66,15 +66,14 @@ class App extends Component {
 
   //basic new soundboard without any name
   newSoundboard = (id) => {
-    //hard coded user id needs fixing
     console.log(id)
     console.log(typeof id)
     const newSoundboard = {
-      name: '',
+      name: `New Soundboard ${Date.now()}`,
       public: false,
     }
 
-    fetch(config.API_ENDPOINT + '/api/soundboards', {
+    return fetch(config.API_ENDPOINT + '/api/soundboards', {
       method: 'POST',
       body: JSON.stringify(newSoundboard),
       headers: {
@@ -88,8 +87,10 @@ class App extends Component {
         }
         return r.json()
       })
-      .then(
-        this.fetchSoundboards() //This is basically another componentDidMount
+      .then((response) => 
+        this.fetchSoundboards().then(
+          () => response
+        ) 
       )
       .catch(error => {
         console.error(error)
