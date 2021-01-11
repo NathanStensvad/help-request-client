@@ -32,6 +32,11 @@
 
   img {
     width: 50%;
+    border: 3px solid #000000
+  }
+
+  .exp {
+    width: 25%;
   }
   
   .how {
