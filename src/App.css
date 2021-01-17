@@ -1,4 +1,159 @@
 * {
-    margin: 0;
-    padding: 0;
-  }
+  margin: 0px;
+  padding: 0px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+html {
+  background-color: #D6D5C9;
+}
+
+/*Gives the top part color and spacing and stays on top*/
+header {
+  background-color: #A22C29;
+  font-family: 'Press Start 2P', cursive;
+  color: #0A100D;
+  /*flex*/
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+/*Adds some spacing around the buttons*/
+button, h2, p {
+  margin: 10px;
+  padding: 5px;
+}
+
+/*Removes the resize option for the textareas*/
+textarea {
+  resize: none;
+  margin: 10px;
+  padding: 10px;
+  width: 75%;
+}
+
+/*This is for the stars*/
+img {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 10px;
+}
+
+/*For the title on the top of the screen*/
+.title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 20px;
+  margin-top: 25px;
+  padding-left: 20px;
+  flex-grow: 2;
+}
+
+/*For the login on top of the screen*/
+.login {
+  font-size: 12px;
+  background-color: #A22C29;
+  font-family: 'Press Start 2P', cursive;
+}
+
+/*request ones are for the request box formatting*/
+.request-container {
+  flex-wrap: wrap;
+}
+
+.request-box {
+  height: 150px;
+  width: 200px;
+  border-radius: 25px; 
+  border: 2px solid black;
+}
+
+.request-text {
+  padding: 0;
+  margin: 0;
+  width: 150px;
+  height: 75px;
+}
+
+/*Also for the request boxes*/
+.post-date {
+  padding:0;
+  margin:0;
+}
+
+/*Provides a background for certain things*/
+.backdrop {
+  width: 75%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 30px;
+  margin-top: 10px;
+  background-color: #B9BAA3;
+}
+
+/*Bump activity button*/
+.big-button {
+  width: 150px;
+  height: 50px;
+}
+
+/*Turn off request button*/
+.small-button {
+  width: 125px;
+  height: 75px;
+}
+
+/*If the response was correct*/
+.correct {
+  background-color: #228b22;
+}
+
+/*If the response was correct*/
+.incorrect {
+  background-color: #FF0B00;
+}
+
+/*For the main content to start below the header*/
+.content {
+    margin-top: 125px;
+}
+
+/*post, post-text, post-options(a/b) are all to format a post made on a request*/
+.post {
+  display: flex;
+}
+
+.post-text {
+  flex: 4;
+  margin: 0;
+  width: 100%;
+}
+
+.post-options {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.post-options-a {
+  flex: 1;
+}
+
+.post-options-b {
+  flex: 1;
+}
+
+/*generic alignments*/
+.center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.column {
+  flex-direction: column;
+}
+
